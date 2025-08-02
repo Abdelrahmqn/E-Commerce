@@ -1,4 +1,4 @@
-# E-commerce Backend (MEN Stack)
+# E-commerce Backend (MEAN Stack)
 
 A simple backend for an e-commerce website using MongoDB, Express, and Node.js.
 
