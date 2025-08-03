@@ -4,9 +4,18 @@ import mongoose, { model, Schema } from "mongoose"
 const userSchema = new Schema({
     firstName: String,
     lastName: String,
+    email: String,
     password: String,
     age: Number,
-    email: String
+    role: {
+        type: String,
+        enum: ['admin', 'user'],
+        default: "user"
+    },
+    isConfirmed: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true,
     versionKey: false
