@@ -1,5 +1,4 @@
 import { UserModel } from "../../db/models/user.model.js";
-import { check_email } from "../../utilities/middlewares/check_email.js";
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv';
 import jwt from "jsonwebtoken";
@@ -10,13 +9,11 @@ export let register = async (req, res) => {
         const hashedPassword = bcrypt.hashSync(req.body.password, 10);
         req.body.password = hashedPassword;
 
-        const addUser = await UserModel.insertMany([req.body]);
-        console.log(hashedPassword);
-        
+        const addUser = await UserModel.create(req.body);        
 
-        addUser[0].password = undefined;
+        addUser.password = undefined;
 
-            res.status(200).json({ message: `The user ${addUser[0].firstName} just registered!!` });
+        res.status(201).json({ message: `The user ${addUser.firstName} just registered!!` });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
@@ -35,31 +32,28 @@ export let login = async (req, res) => {
     
     let token = jwt.sign({_id: foundUser._id, role: foundUser.role}, process.env.SECRET_TOKEN)
     console.log(token)
+    console.log(foundUser.id)
     res.status(200).json({Message: `Welcome ${foundUser.firstName}`});
     
 }
 
-export let AllUsers = async(req, res) => {
-    const allusers = await UserModel.find();
-    const userRole = await UserModel.find({role: req.body.role});
-    
-    if (userRole === 'admin') return res.status(200).json({message: `All users from admin`}, allusers)    
-    return res.status(409).json({message: "only admin can see users"})
+export let AllUsers = async(req, res) => { //from admin
+    try {
+        const allusers = await UserModel.find().select("password");
+        return res.status(200).json({ message: "All users", users: allusers });
+    } catch (error) {
+        console.log(error);
+        
+    }
+
 }
 
 export let deleteUser = async (req, res) => {
     try {
-        const userId = req.params.id;
-        const updateData = req.body;
+        const deleteUser = await UserModel.findByIdAndDelete(req.params.id);
+        if (!deleteUser) return res.status(404).json({message: "User not found"});
 
-        const deleteUser = await UserModel.findByIdAndDelete(
-        userId,
-        updateData,
-        { new: true, runValidators: true }
-        );
-
-        if (!deleteUser) return res.status(404).json({message: "User not found"})
-
+        res.status(200).json({ message: `User ${deleteUser.firstName} deleted` });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -69,7 +63,11 @@ export let deleteUser = async (req, res) => {
 export let updateUser = async (req, res) => {
     try {
         const userId = req.params.id;
-        const updateData = req.body;
+        const updateData = { ...req.body };
+
+        if (updateData.password) {
+            updateData.password = bcrypt.hashSync(updateData.password, 10);
+        }
 
         const updatedUser = await UserModel.findByIdAndUpdate(
         userId,
@@ -78,6 +76,7 @@ export let updateUser = async (req, res) => {
         );
 
         if (!updateUser) return res.status(404).json({message: "User not found"})
+            updatedUser.password = undefined;
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
