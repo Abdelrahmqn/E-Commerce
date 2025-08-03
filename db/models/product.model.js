@@ -10,7 +10,7 @@ const ProductSchema = new Schema({
     quantity: {
         type: Number,
         require: true,
-        default: 0
+        default: 1
     },
     createdBy: {
         type: mongoose.Types.ObjectId,

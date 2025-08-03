@@ -1,7 +1,8 @@
 import { UserModel } from "../../db/models/user.model.js";
+import { sendMail } from "../../utilities/email/sendMail.js"
 import bcrypt from 'bcrypt'
+import jwt, { decode } from "jsonwebtoken";
 import dotenv from 'dotenv';
-import jwt from "jsonwebtoken";
 dotenv.config();
 
 export let register = async (req, res) => {
@@ -9,11 +10,11 @@ export let register = async (req, res) => {
         const hashedPassword = bcrypt.hashSync(req.body.password, 10);
         req.body.password = hashedPassword;
 
-        const addUser = await UserModel.create(req.body);        
+        const addUser = await UserModel.insertMany(req.body);        
 
-        addUser.password = undefined;
-
-        res.status(201).json({ message: `The user ${addUser.firstName} just registered!!` });
+        addUser[0].password = undefined;
+        sendMail(req.body.email)
+        res.status(201).json({ message: `The user ${addUser} just registered!!` });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
@@ -31,7 +32,6 @@ export let login = async (req, res) => {
         return res.status(409).json({message: "incorrect email or password"})
     
     let token = jwt.sign({_id: foundUser._id, role: foundUser.role}, process.env.SECRET_TOKEN)
-    console.log(token)
     console.log(foundUser.id)
     res.status(200).json({Message: `Welcome ${foundUser.firstName}`});
     
@@ -51,8 +51,6 @@ export let AllUsers = async(req, res) => { //from admin
 export let deleteUser = async (req, res) => {
     try {
         const deleteUser = await UserModel.findByIdAndDelete(req.params.id);
-        if (!deleteUser) return res.status(404).json({message: "User not found"});
-
         res.status(200).json({ message: `User ${deleteUser.firstName} deleted` });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -62,23 +60,24 @@ export let deleteUser = async (req, res) => {
 
 export let updateUser = async (req, res) => {
     try {
-        const userId = req.params.id;
-        const updateData = { ...req.body };
+        const exist = await UserModel.findOne({_id:req.params.id})
+    
+    
+    if(!exist) 
+        return res.json({message:" user with this email doesn't exist"})
 
-        if (updateData.password) {
-            updateData.password = bcrypt.hashSync(updateData.password, 10);
-        }
-
-        const updatedUser = await UserModel.findByIdAndUpdate(
-        userId,
-        updateData,
-        { new: true, runValidators: true }
-        );
-
-        if (!updateUser) return res.status(404).json({message: "User not found"})
-            updatedUser.password = undefined;
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        const updatedUser =await UserModel.findByIdAndUpdate( req.params.id , {...req.body},{returnDocument:"after"})
+        res.json({message:"updated successfully", updatedUser})
+    } catch (err) {
+        res.status(404).json({err: err.message})
     }
+}
 
+export let verifyAccount = async (req, res) => {
+    jwt.verify(req.params.email, process.env.SECRET_TOKEN, async (err, decode) => {
+        if (err) return res.status(409).json({message: "Invalid Email"});
+        await UserModel.findOneAndUpdate({email: decode.email}, {isConfirmed: true})
+        res.json({message: "Account Confirmed successfully!!"})
+    })
+    
 }
