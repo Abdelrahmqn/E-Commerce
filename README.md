@@ -6,6 +6,7 @@ A simple backend for an e-commerce website using MongoDB, Express, and Node.js.
 - User authentication with JWT
 - Product and category management
 - Shopping cart and order handling
+- admin website controller
 
 ## Setup
 1. Clone the repo
