@@ -22,20 +22,28 @@ export let register = async (req, res) => {
 
 
 export let login = async (req, res) => {
-    const foundUser = await UserModel.findOne({email: req.body.email});
+  const foundUser = await UserModel.findOne({ email: req.body.email });
 
-    if (!foundUser)
-        return res.json({message: "incorrect email or password"})
+  if (!foundUser)
+    return res.status(404).json({ message: "Incorrect email or password" });
+
+  const match = bcrypt.compareSync(req.body.password, foundUser.password);
+  if (!match)
+    return res.status(409).json({ message: "Incorrect email or password" });
+
+  let token = jwt.sign(
+    { _id: foundUser._id, role: foundUser.role },
+    process.env.SECRET_TOKEN
+  );
+
+  console.log("token from login", token);
+
+  res.status(200).json({
+    message: `Welcome ${foundUser.firstName}`,
+    token: token // <-- 🔥 THIS is what your frontend/Postman needs
+  });
+};
     
-    const match = bcrypt.compareSync(req.body.password, foundUser.password)
-    if (!match)
-        return res.status(409).json({message: "incorrect email or password"})
-    
-    let token = jwt.sign({_id: foundUser._id, role: foundUser.role}, process.env.SECRET_TOKEN)
-    console.log(foundUser.id)
-    res.status(200).json({Message: `Welcome ${foundUser.firstName}`});
-    
-}
 
 export let AllUsers = async(req, res) => { //from admin
     try {
@@ -73,11 +81,12 @@ export let updateUser = async (req, res) => {
     }
 }
 
+
+
 export let verifyAccount = async (req, res) => {
     jwt.verify(req.params.email, process.env.SECRET_TOKEN, async (err, decode) => {
         if (err) return res.status(409).json({message: "Invalid Email"});
         await UserModel.findOneAndUpdate({email: decode.email}, {isConfirmed: true})
         res.json({message: "Account Confirmed successfully!!"})
     })
-    
 }

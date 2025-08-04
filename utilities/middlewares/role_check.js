@@ -4,29 +4,35 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-// export const auth = (req, res, next) => {
-//     const authHeader = req.headers.authorization;
-//     console.log("AUTH HEADER:", authHeader);
+export let isAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    console.log("Authorization header:", authHeader);
 
-//     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-//         return res.status(401).json({ message: "Missing token" });
-//     }
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Authentication token missing' });
+    }
 
-//     const token = authHeader.split(" ")[1];
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.SECRET_TOKEN);
+    const user = await UserModel.findById(decoded._id);
 
-//     try {
-//         res.status(200).json({ 
-//         message: `Welcome ${foundUser.firstName}`,
-//         token // <-- add this
-//     });
-//         const decoded = jwt.verify(token, process.env.SECRET_TOKEN);
-//         req.user = decoded;
-//         next();
-//     } catch (error) {
-//         console.error("JWT Error:", error.message);
-//         res.status(401).json({ message: "Invalid token" });
-//     }
-// };
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    if (!user.isConfirmed) {
+      return res.status(403).json({ message: 'Please confirm your email before accessing this resource' });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error("Auth Middleware Error:", error); // Add this
+    res.status(401).json({ error: error.message });
+  }
+};
+
 
 export const isAdmin = async (req, res, next) => {
   try {
@@ -45,3 +51,9 @@ export const isAdmin = async (req, res, next) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const check_email = async (req, res, next) => {
+    const exist = await UserModel.findOne({email:req.body.email})
+         if(exist) return res.json({message:"User Already Registered, Please Login "})
+           next() 
+}

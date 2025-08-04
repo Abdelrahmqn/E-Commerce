@@ -26,4 +26,4 @@ const ProductSchema = new Schema({
     versionKey: false
 })
 
-export const ProductModel = model("User", ProductSchema);
+export const ProductModel = mongoose.models.Product || model("Product", ProductSchema);

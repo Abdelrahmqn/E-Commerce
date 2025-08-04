@@ -19,4 +19,4 @@ const CartSchema = new Schema({
     versionKey: false
 })
 
-export const CartModel = model("User", CartSchema);
+export const CartModel = mongoose.models.User || model("Cart", CartSchema);

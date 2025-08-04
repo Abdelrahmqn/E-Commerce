@@ -1,11 +1,15 @@
-// import { createProduct, getAllProducts, getProductById, deleteProduct, updateProduct } from './product_controller.js';
-// export const ProductRouter = express.Router();
+import { createProduct, getProducts, updateProduct, deleteProduct } from './product_controller.js';
+import express from 'express';
+// import { isAdmin } from '../../utilities/middlewares/role_checker.js';
 
-// const express = require('express');
 
-// ProductRouter.post('/products', createProduct);
-// ProductRouter.get('/products', getAllProducts);
-// ProductRouter.get('/products/:id', getProductById);
-// ProductRouter.put('/products/:id', updateProduct);
-// ProductRouter.delete('/products/:id', deleteProduct);
+export const ProductRouter = express.Router();
+ProductRouter.use(express.json());
+
+ProductRouter.post('/add/product/:id', createProduct);
+
+ProductRouter.get('/products', getProducts);
+
+ProductRouter.put('/product/:id', updateProduct);
+ProductRouter.delete('/product/delete/:id', deleteProduct);
 
