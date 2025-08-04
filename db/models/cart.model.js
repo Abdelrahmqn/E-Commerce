@@ -2,18 +2,25 @@ import mongoose, { model, Schema } from "mongoose"
 
 
 const CartSchema = new Schema({
-    name: String, // abdelrahman's cart
-    quantity: {
+    items: [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true
+      },
+      quantity: {
         type: Number,
-        required: true,
-        default: 0
-    },
-    image_url: {
-        type: String,
-        default: ""
-    },
-    id: Number,
-    total_price: Number
+        default: 1,
+        min: 1
+      }
+    }
+  ],
+    OwnedBy: {
+        type: mongoose.Types.ObjectId,
+        ref:"User",
+        required: true
+    }
 }, {
     timestamps: true,
     versionKey: false
