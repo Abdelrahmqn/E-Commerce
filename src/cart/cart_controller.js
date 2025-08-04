@@ -47,5 +47,3 @@ export const NewCart = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
-
-// last token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODkxMWVlNWZlZTNmNWViMTAwYzlhNjMiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1NDM0MTEwNH0.BCiZ2Iw0zrjo4gABdsHL2avRBwR2Iz20CjF0J8__MBM
