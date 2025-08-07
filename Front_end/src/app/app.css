@@ -1,0 +1,10 @@
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url("https://static.vecteezy.com/system/resources/thumbnails/023/455/517/small_2x/simple-blue-white-abstract-background-for-presentation-business-banner-technology-etc-free-vector.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }

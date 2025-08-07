@@ -1,0 +1,48 @@
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Register</h4>
+                </div>
+                <div class="card-body">
+                  <div *ngIf="flashMessage" [ngClass]="{
+                  'alert': true,
+                  'alert-success': flashType === 'success',
+                  'alert-danger': flashType === 'error'
+                }" role="alert" class="text-center">
+              </div>
+                    <form  [formGroup]="register" (ngSubmit)="sendData()">
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input formControlName="firstName" type="text" class="form-control" id="firstName" placeholder="Enter your first name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Last Name</label>
+                            <input formControlName="lastName" type="text" class="form-control" id="lastName" placeholder="Enter your second name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input formControlName="email" type="email" class="form-control" id="email" placeholder="email@example.com">
+                        </div>
+                        <div class="mb-3">
+                          <label for="age">age</label>
+                          <input formControlName="age" class="form-control" type="number"  id="age">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input formControlName="password" type="password" class="form-control" id="password" placeholder="Enter your password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                        <p class="text-center text-muted mt-4">have an account?
+
+                        <a href="/login" class="text-decoration-none" routerLinkActive="activeClass" routerLink="/login">Log in</a>.
+                    </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
