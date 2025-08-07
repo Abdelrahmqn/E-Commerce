@@ -1,0 +1,20 @@
+
+            <div class="myCard p-3 rounded-3 shadow-lg">
+                <div class="image">
+                    <img class="w-100" [src]="product.image_url" alt="" style="height: 200px;">
+                </div>
+                <div class="caption mt-2">
+                    <h3 class="h5">{{ product.title}}</h3>
+                    <p>{{product.social_rank}}</p>
+                </div>
+                <p>Price: {{250 |currency:'GBP'}}</p>
+                <p>Quantity: {{99}}</p>
+                <div class="buttons-container d-flex justify-content-center gap-3">
+                    <button class="btn btn-warning">
+                        <a class="nav-link" [href]="product.publisher_url">Source</a>
+                    </button>
+                    <button class="btn btn-primary">Details</button>
+
+                </div>
+                <p class="text-end mt-1 ">Publisher: {{product.publisher}}</p>
+            </div>

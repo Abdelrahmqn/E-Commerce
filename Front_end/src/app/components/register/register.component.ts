@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { first } from 'rxjs';
 import { NavBar } from '../nav-bar/nav-bar';
-import { AuthService } from '../services/auth';
+import { AuthService } from '../../services/auth';
 import { CommonModule } from '@angular/common';
 
 @Component({
