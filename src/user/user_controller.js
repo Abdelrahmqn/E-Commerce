@@ -27,6 +27,10 @@ export let login = async (req, res) => {
   if (!foundUser)
     return res.status(404).json({ message: "Incorrect email or password" });
 
+  if (!foundUser.isConfirmed) {
+    return res.status(401).json({ message: "Account is not confirmed" });
+  }
+
   const match = bcrypt.compareSync(req.body.password, foundUser.password);
   if (!match)
     return res.status(409).json({ message: "Incorrect email or password" });
@@ -85,7 +89,7 @@ export let updateUser = async (req, res) => {
 
 export let verifyAccount = async (req, res) => {
     jwt.verify(req.params.email, process.env.SECRET_TOKEN, async (err, decode) => {
-        if (err) return res.status(409).json({message: "Invalid Email"});
+        if (err) return res.status(409).json({message: "Please Confirm your email first "});
         await UserModel.findOneAndUpdate({email: decode.email}, {isConfirmed: true})
         res.json({message: "Account Confirmed successfully!!"})
     })
